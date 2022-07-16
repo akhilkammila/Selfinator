@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Button, SafeAreaView } from 'react-native';
-import {Camera} from 'expo-camera';
+import { StyleSheet, Text, View, Image, Button, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
+import {Camera, CameraType} from 'expo-camera';
 import {shareAsync} from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import * as faceapi from 'face-api.js';
@@ -12,6 +12,11 @@ function CameraPage(props) {
     const [hasCameraPermission, setHasCameraPermission] = useState()
     const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState()
     const [photo, setPhoto] = useState();
+    const [type, setType] = useState(CameraType.back);
+
+    const back = ()=>{
+        props.navigation.navigate('Home_Screen')
+    }
 
 
     useEffect(()=>{
@@ -36,15 +41,22 @@ function CameraPage(props) {
             base64: true,
             exif: false
         }
+
+        //code with face api
         // faceapi.matchDimensions(cameraRef.current);
-        console.log('reached')
-        const detections = await faceapi.detectAllFaces(cameraRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
-        console.log(detections.length);
-        console.log(detections[0].expressions.happy);
-        if (detections.length > 0 && detections[0].expressions.happy > 0.5) {
-            let newPhoto  = await cameraRef.current.takePictureAsync(options);
-            setPhoto(newPhoto);
-        }
+        // console.log('reached')
+        // const detections = await faceapi.detectAllFaces(cameraRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
+        // console.log(detections.length);
+        // console.log(detections[0].expressions.happy);
+        // if (detections.length > 0 && detections[0].expressions.happy > 0.5) {
+        //     let newPhoto  = await cameraRef.current.takePictureAsync(options);
+        //     setPhoto(newPhoto);
+        // }
+
+        //code without face api
+        console.log('taking photo')
+        let newPhoto  = await cameraRef.current.takePictureAsync(options);
+        setPhoto(newPhoto);
     };
 
     if (photo){
@@ -72,9 +84,27 @@ function CameraPage(props) {
     }
 
     return (
-        <Camera style={styles.container} ref={cameraRef}>
+        <Camera style={styles.container} ref={cameraRef} type={type}>
             <View style={styles.buttonContainer}>
-                <Button title="Take Picture" onPress = {takePic}></Button>
+                <View style={styles.buttonContainer2}>
+                    <TouchableWithoutFeedback onPress={back}>
+                        <Image source={require('./assets/back.png')} width="100" height="100"/>
+                    </TouchableWithoutFeedback>
+
+                    <TouchableWithoutFeedback onPress={takePic}>
+                        <Image source={require('./assets/camera100.png')} width="100" height="100"/>
+                    </TouchableWithoutFeedback>
+
+                    <TouchableWithoutFeedback
+                        onPress={() => {
+                            console.log('turning camera')
+                            setType(type === CameraType.back ? CameraType.front : CameraType.back);
+                        }}
+                    >
+                        <Image source={require('./assets/turncamera.png')} width="100" height="100"/>
+                    </TouchableWithoutFeedback>
+
+                </View>
             </View>
             <StatusBar style="auto"/>
         </Camera>
@@ -83,14 +113,18 @@ function CameraPage(props) {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
       backgroundColor: "#2f2f2f",
+      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
     },
     buttonContainer: {
-        backgroundColor: "#ff6f26",
-        alignSelf: 'flex-end'
+        flex: 1,
+        justifyContent: 'flex-end',
+        marginBottom: 36
+    },
+    buttonContainer2: {
+        flexDirection: 'row',
     },
     preview: {
         alignSelf: 'stretch',
