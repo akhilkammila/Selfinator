@@ -48,8 +48,6 @@ function CameraPage(props) {
             console.log('taking photo')
             let newPhoto  = await cameraRef.current.takePictureAsync(options);
             setPhoto(newPhoto);
-        } else {
-            setTimeout(takePic, 100)
         }
     };
 
@@ -80,8 +78,8 @@ function CameraPage(props) {
                 return (
                     <SafeAreaView style={styles.faces}>
                         <View style={styles.faces2}>
-                            <Text style={styles.faceDesc}>Eyes Open: {eyesOpen.toString()}</Text>
-                            <Text style={styles.faceDesc}>Smiling: {smiling.toString()}</Text>
+                            <Text style={styles.faceDesc}>All Eyes Open: {eyesOpen.toString()}</Text>
+                            <Text style={styles.faceDesc}>Everyone Smiling: {smiling.toString()}</Text>
                         </View>
                     </SafeAreaView>
                 )
@@ -182,7 +180,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         paddingLeft: 20,
         paddingRight: 20,
-        borderRadius: 15
+        borderRadius: 15,
     },
     faceDesc: {
         fontSize: 30,
@@ -190,7 +188,5 @@ const styles = StyleSheet.create({
         fontFamily: "PingFangTC-Semibold",
     }
 });
-//orange: #ff6f26
-//pastel color: "#ffe4a4"
 
 export default CameraPage;
