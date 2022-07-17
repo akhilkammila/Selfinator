@@ -3,9 +3,9 @@ import { StyleSheet, Text, View, Image, Button, SafeAreaView, TouchableWithoutFe
 import {Camera, CameraType} from 'expo-camera';
 import {shareAsync} from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
-import * as faceapi from 'face-api.js';
-import {useEffect, useRef, useState} from 'react';
+import * as FaceDetector from 'expo-face-detector';
 import { StatusBar } from 'expo-status-bar';
+import {useEffect, useRef, useState} from 'react';
 
 function CameraPage(props) {
     let cameraRef = useRef();
@@ -13,11 +13,13 @@ function CameraPage(props) {
     const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState()
     const [photo, setPhoto] = useState();
     const [type, setType] = useState(CameraType.back);
+    const [faceData, setFaceData] = useState([]);
+
+    const [pictureReady, setPictureReady] = useState(false)
 
     const back = ()=>{
         props.navigation.navigate('Home_Screen')
     }
-
 
     useEffect(()=>{
         (async () =>{
@@ -36,28 +38,52 @@ function CameraPage(props) {
     }
 
     let takePic = async() =>{
-        let options = {
-            quality: 1,
-            base64: true,
-            exif: false
+        if (pictureReady){
+            let options = {
+                quality: 1,
+                base64: true,
+                exif: false
+            }
+    
+            console.log('taking photo')
+            let newPhoto  = await cameraRef.current.takePictureAsync(options);
+            setPhoto(newPhoto);
+        } else {
+            setTimeout(takePic, 100)
         }
-
-        //code with face api
-        // faceapi.matchDimensions(cameraRef.current);
-        // console.log('reached')
-        // const detections = await faceapi.detectAllFaces(cameraRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
-        // console.log(detections.length);
-        // console.log(detections[0].expressions.happy);
-        // if (detections.length > 0 && detections[0].expressions.happy > 0.5) {
-        //     let newPhoto  = await cameraRef.current.takePictureAsync(options);
-        //     setPhoto(newPhoto);
-        // }
-
-        //code without face api
-        console.log('taking photo')
-        let newPhoto  = await cameraRef.current.takePictureAsync(options);
-        setPhoto(newPhoto);
     };
+
+    const handleFacesDetected = ({faces})=>{
+        setFaceData(faces)
+    }
+
+    function getFaceDataView(){
+        if (faceData.length === 0){
+            return(
+                <View style={styles.faces}>
+                    <Text style={styles.faceDesc}>no faces detected</Text>
+                </View>
+            )
+        } else{
+            return faceData.map((face, index)=>{
+                const eyesOpen = face.rightEyeOpenProbability>0.4 && face.leftEyeOpenProbability>0.4
+                const smiling = face.smilingProbability>0.4
+                const ready = eyesOpen && smiling
+
+                if (ready!=pictureReady){
+                    setPictureReady(ready);
+                }
+
+                return (
+                    <View style={styles.faces}>
+                        <Text style={styles.faceDesc}>Eyes Open: {eyesOpen.toString()}</Text>
+                        <Text style={styles.faceDesc}>Smiling: {smiling.toString()}</Text>
+                    </View>
+                )
+
+            })
+        }
+    }
 
     if (photo){
         let sharePic = () =>{
@@ -84,7 +110,15 @@ function CameraPage(props) {
     }
 
     return (
-        <Camera style={styles.container} ref={cameraRef} type={type}>
+        <Camera style={styles.container} ref={cameraRef} type={type}
+        onFacesDetected={handleFacesDetected}
+        faceDetectorSettings={{
+            mode: FaceDetector.FaceDetectorMode.fast,
+            detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
+            runClassifications: FaceDetector.FaceDetectorClassifications.all,
+            minDetectionInterval: 100,
+            tracking: true
+        }}>
             <View style={styles.buttonContainer}>
                 <View style={styles.buttonContainer2}>
                     <TouchableWithoutFeedback onPress={back}>
@@ -107,6 +141,7 @@ function CameraPage(props) {
                 </View>
             </View>
             <StatusBar style="auto"/>
+            {getFaceDataView()}
         </Camera>
     );
 }
@@ -129,6 +164,13 @@ const styles = StyleSheet.create({
     preview: {
         alignSelf: 'stretch',
         flex: 1
+    },
+    faces: {
+        backgroundColor: "#fff",
+        margin: 16
+    },
+    faceDesc: {
+        fontSize: 30
     }
 });
 
