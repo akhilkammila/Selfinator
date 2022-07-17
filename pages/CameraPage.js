@@ -60,9 +60,12 @@ function CameraPage(props) {
     function getFaceDataView(){
         if (faceData.length === 0){
             return(
-                <View style={styles.faces}>
-                    <Text style={styles.faceDesc}>no faces detected</Text>
-                </View>
+                <SafeAreaView style={styles.faces}>
+                    <View style={styles.faces2}>
+                        <Text style={styles.faceDesc}>No Faces Were</Text>
+                        <Text style={styles.faceDesc}>Detected</Text>
+                    </View>
+                </SafeAreaView>
             )
         } else{
             return faceData.map((face, index)=>{
@@ -75,10 +78,12 @@ function CameraPage(props) {
                 }
 
                 return (
-                    <View style={styles.faces}>
-                        <Text style={styles.faceDesc}>Eyes Open: {eyesOpen.toString()}</Text>
-                        <Text style={styles.faceDesc}>Smiling: {smiling.toString()}</Text>
-                    </View>
+                    <SafeAreaView style={styles.faces}>
+                        <View style={styles.faces2}>
+                            <Text style={styles.faceDesc}>Eyes Open: {eyesOpen.toString()}</Text>
+                            <Text style={styles.faceDesc}>Smiling: {smiling.toString()}</Text>
+                        </View>
+                    </SafeAreaView>
                 )
 
             })
@@ -119,6 +124,7 @@ function CameraPage(props) {
             minDetectionInterval: 100,
             tracking: true
         }}>
+            {getFaceDataView()}
             <View style={styles.buttonContainer}>
                 <View style={styles.buttonContainer2}>
                     <TouchableWithoutFeedback onPress={back}>
@@ -141,7 +147,6 @@ function CameraPage(props) {
                 </View>
             </View>
             <StatusBar style="auto"/>
-            {getFaceDataView()}
         </Camera>
     );
 }
@@ -166,12 +171,26 @@ const styles = StyleSheet.create({
         flex: 1
     },
     faces: {
-        backgroundColor: "#fff",
-        margin: 16
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    faces2: {
+        backgroundColor: "#ffe4a4",
+        alignItems: 'center',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        borderRadius: 15
     },
     faceDesc: {
-        fontSize: 30
+        fontSize: 30,
+        color: "#ff6f26",
+        fontFamily: "PingFangTC-Semibold",
     }
 });
+//orange: #ff6f26
+//pastel color: "#ffe4a4"
 
 export default CameraPage;
