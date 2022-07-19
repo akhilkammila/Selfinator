@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Button, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
-import {Camera, CameraType} from 'expo-camera';
-import {shareAsync} from 'expo-sharing';
+import { Camera, CameraType } from 'expo-camera';
+import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import * as FaceDetector from 'expo-face-detector';
 import { StatusBar } from 'expo-status-bar';
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function CameraPage(props) {
     let cameraRef = useRef();
@@ -17,47 +17,48 @@ function CameraPage(props) {
 
     const [pictureReady, setPictureReady] = useState(false)
 
-    const back = ()=>{
+    const back = () => {
         props.navigation.navigate('Home_Screen')
     }
 
-    useEffect(()=>{
-        (async () =>{
+    useEffect(() => {
+        (async () => {
             const cameraPermission = await Camera.requestCameraPermissionsAsync();
             const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
-            setHasCameraPermission(cameraPermission.status==="granted")
+            setHasCameraPermission(cameraPermission.status === "granted")
             setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted")
 
         })();
     }, [])
 
-    if (hasCameraPermission === undefined){
+    if (hasCameraPermission === undefined) {
         return <Text>Requesting Permissions...</Text>
     } else if (!hasCameraPermission) {
         return <Text>Permission for camera not granted. Please change this in settings.</Text>
     }
 
-    let takePic = async() =>{
-        if (pictureReady){
+    let takePic = async () => {
+        if (pictureReady) {
             let options = {
                 quality: 1,
                 base64: true,
                 exif: false
             }
-    
+
             console.log('taking photo')
-            let newPhoto  = await cameraRef.current.takePictureAsync(options);
+            let newPhoto = await cameraRef.current.takePictureAsync(options);
             setPhoto(newPhoto);
         }
     };
 
-    const handleFacesDetected = ({faces})=>{
+    const handleFacesDetected = ({ faces }) => {
         setFaceData(faces)
+        console.log(faces.length)
     }
 
-    function getFaceDataView(){
-        if (faceData.length === 0){
-            return(
+    function getFaceDataView() {
+        if (faceData.length === 0) {
+            return (
                 <SafeAreaView style={styles.faces}>
                     <View style={styles.faces2}>
                         <Text style={styles.faceDesc}>No Faces Were</Text>
@@ -65,72 +66,79 @@ function CameraPage(props) {
                     </View>
                 </SafeAreaView>
             )
-        } else{
-            return faceData.map((face, index)=>{
-                const eyesOpen = face.rightEyeOpenProbability>0.4 && face.leftEyeOpenProbability>0.4
-                const smiling = face.smilingProbability>0.4
-                const ready = eyesOpen && smiling
+        } else {
+            let eyesOpen = true
+            let smiling = true
 
-                if (ready!=pictureReady){
-                    setPictureReady(ready);
+            for (const face of faceData){
+                if(face.rightEyeOpenProbability < 0.4 || face.leftEyeOpenProbability < 0.4){
+                    eyesOpen=false
                 }
+                if (face.smilingProbability < 0.4){
+                    smiling=false
+                }
+            }
 
-                return (
-                    <SafeAreaView style={styles.faces}>
-                        <View style={styles.faces2}>
-                            <Text style={styles.faceDesc}>All Eyes Open: {eyesOpen.toString()}</Text>
-                            <Text style={styles.faceDesc}>Everyone Smiling: {smiling.toString()}</Text>
-                        </View>
-                    </SafeAreaView>
-                )
+            const ready = eyesOpen && smiling
 
-            })
+            if (ready != pictureReady) {
+                setPictureReady(ready);
+            }
+
+            return (
+                <SafeAreaView style={styles.faces}>
+                    <View style={styles.faces2}>
+                        <Text style={styles.faceDesc}>All Eyes Open: {eyesOpen.toString()}</Text>
+                        <Text style={styles.faceDesc}>Everyone Smiling: {smiling.toString()}</Text>
+                    </View>
+                </SafeAreaView>
+            )
         }
     }
 
-    if (photo){
-        let sharePic = () =>{
-            shareAsync(photo.uri).then(()=>{
+    if (photo) {
+        let sharePic = () => {
+            shareAsync(photo.uri).then(() => {
                 setPhoto(undefined);
             })
             console.log(hasMediaLibraryPermission)
         };
 
-        let savePhoto = () =>{
-            MediaLibrary.saveToLibraryAsync(photo.uri).then(()=>{
+        let savePhoto = () => {
+            MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
                 setPhoto(undefined);
             });
         };
-        
-        return(
+
+        return (
             <SafeAreaView style={styles.container}>
-                <Image style={styles.preview} source={{uri: "data:image/jpg;base64," + photo.base64}}></Image>
-                <Button title="Share" onPress = {sharePic}></Button>
-                {hasMediaLibraryPermission ? <Button title="Save" onPress={savePhoto}/> : undefined}
-                <Button title="Discard" onPress = {() => setPhoto(undefined)}></Button>
+                <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64 }}></Image>
+                <Button title="Share" onPress={sharePic}></Button>
+                {hasMediaLibraryPermission ? <Button title="Save" onPress={savePhoto} /> : undefined}
+                <Button title="Discard" onPress={() => setPhoto(undefined)}></Button>
             </SafeAreaView>
         )
     }
 
     return (
         <Camera style={styles.container} ref={cameraRef} type={type}
-        onFacesDetected={handleFacesDetected}
-        faceDetectorSettings={{
-            mode: FaceDetector.FaceDetectorMode.fast,
-            detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
-            runClassifications: FaceDetector.FaceDetectorClassifications.all,
-            minDetectionInterval: 100,
-            tracking: true
-        }}>
+            onFacesDetected={handleFacesDetected}
+            faceDetectorSettings={{
+                mode: FaceDetector.FaceDetectorMode.fast,
+                detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
+                runClassifications: FaceDetector.FaceDetectorClassifications.all,
+                minDetectionInterval: 100,
+                tracking: true
+            }}>
             {getFaceDataView()}
             <View style={styles.buttonContainer}>
                 <View style={styles.buttonContainer2}>
                     <TouchableWithoutFeedback onPress={back}>
-                        <Image source={require('./assets/back.png')} width="100" height="100"/>
+                        <Image source={require('./assets/back.png')} width="100" height="100" />
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback onPress={takePic}>
-                        <Image source={require('./assets/camera100.png')} width="100" height="100"/>
+                        <Image source={require('./assets/camera100.png')} width="100" height="100" />
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback
@@ -139,22 +147,22 @@ function CameraPage(props) {
                             setType(type === CameraType.back ? CameraType.front : CameraType.back);
                         }}
                     >
-                        <Image source={require('./assets/turncamera.png')} width="100" height="100"/>
+                        <Image source={require('./assets/turncamera.png')} width="100" height="100" />
                     </TouchableWithoutFeedback>
 
                 </View>
             </View>
-            <StatusBar style="auto"/>
+            <StatusBar style="auto" />
         </Camera>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-      backgroundColor: "#2f2f2f",
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+        backgroundColor: "#2f2f2f",
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     buttonContainer: {
         flex: 1,
