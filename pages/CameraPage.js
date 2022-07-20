@@ -31,29 +31,34 @@ function CameraPage(props) {
         })();
     }, [])
 
-    if (hasCameraPermission === undefined) {
-        return <Text>Requesting Permissions...</Text>
-    } else if (!hasCameraPermission) {
-        return <Text>Permission for camera not granted. Please change this in settings.</Text>
-    }
+    // if (hasCameraPermission === undefined) {
+    //     return <Text>Requesting Permissions...</Text>
+    // } else if (!hasCameraPermission) {
+    //     return <Text>Permission for camera not granted. Please change this in settings.</Text>
+    // }
 
-    let takePic = async () => {
-        if (pictureReady) {
-            let options = {
-                quality: 1,
-                base64: true,
-                exif: false
-            }
-
-            console.log('taking photo')
-            let newPhoto = await cameraRef.current.takePictureAsync(options);
-            setPhoto(newPhoto);
+    function takePic(){
+        console.log('running takePic')
+        if (pictureReady){
+            executeTakePic()
+        } else{
+            setTimeout(function(){takePic()}, 1000)
         }
     };
 
+    async function executeTakePic(){
+        let options = {
+            quality: 1,
+            base64: true,
+            exif: false
+        }
+
+        let newPhoto = await cameraRef.current.takePictureAsync(options);
+        setPhoto(newPhoto);
+    }
+
     const handleFacesDetected = ({ faces }) => {
         setFaceData(faces)
-        console.log(faces.length)
     }
 
     function getFaceDataView() {
@@ -82,6 +87,7 @@ function CameraPage(props) {
             const ready = eyesOpen && smiling
 
             if (ready != pictureReady) {
+                console.log('CHANGEING PICTURE READY')
                 setPictureReady(ready);
             }
 
@@ -127,7 +133,7 @@ function CameraPage(props) {
                 mode: FaceDetector.FaceDetectorMode.fast,
                 detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
                 runClassifications: FaceDetector.FaceDetectorClassifications.all,
-                minDetectionInterval: 100,
+                minDetectionInterval: 200,
                 tracking: true
             }}>
             {getFaceDataView()}
