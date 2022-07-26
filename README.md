@@ -22,5 +22,5 @@ We learned how to code in React Native. We learned how to use different ML model
 ## 🔜 What's next for Smart Cam
 We plan to make Selfinator available to be used by everyone on the app store. More long term, we hope that we can license the technology to companies like Snapchat and Apple, as it could greatly enhance their camera applications.
 
-## Try It OUT!
+## 🙌 Try It OUT!
 [App Demo](https://www.youtube.com/watch?v=-Ah46H1wutE&ab_channel=AyushGarg)
