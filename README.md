@@ -23,6 +23,4 @@ We learned how to code in React Native. We learned how to use different ML model
 We plan to make Selfinator available to be used by everyone on the app store. More long term, we hope that we can license the technology to companies like Snapchat and Apple, as it could greatly enhance their camera applications.
 
 ## Try It OUT!
-[Youtube Link](https://www.youtube.com/watch?v=-Ah46H1wutE&ab_channel=AyushGarg)
-<br />
-[Live App](https://vershio.vercel.app/)
+[App Demo](https://www.youtube.com/watch?v=-Ah46H1wutE&ab_channel=AyushGarg)
