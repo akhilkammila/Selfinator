@@ -14,11 +14,5 @@ We used React Native to implement the frontend of the app. Because of this, the 
 ## 🧠 Challenges we ran into
 We ran into numerous challenges throughout the app development process. One major challenge was dealing with asynchronous functions in react. The async of variables prevented our camera from taking pictures even once we detected that everyone had their "best face" on. Other issues included a failed use of GET http protocol for requests to the backend, and running SmartCam on multiple faces.
 
-## 🏅 Accomplishments that we're proud of
-We are extremely proud of implementing SmartCam with react-native, even though none of our team members had worked with mobile apps before. Our best accomplishment, however, was creating highly successful real-time face detection software.
-
-## 📖 What we learned
-We learned how to code in React Native. We learned how to use different ML models. We learned more about http protocols (GET, POST) and the limits of them.
-
 ## 🔜 What's next for Smart Cam
 We plan to make Selfinator available to be used by everyone on the app store. More long term, we hope that we can license the technology to companies like Snapchat and Apple, as it could greatly enhance their camera applications.
