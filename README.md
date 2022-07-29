@@ -1,4 +1,4 @@
-# Smart Cam
+# Smart Cam 📸 🎉
 [Video Demo](https://www.youtube.com/watch?v=-Ah46H1wutE&ab_channel=AyushGarg)
 
 ## 💡 Inspiration
